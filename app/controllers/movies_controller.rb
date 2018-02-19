@@ -16,6 +16,26 @@ class MoviesController < ApplicationController
     @movies = Movie.all
     @all_ratings = Movie.get_ratings
     redirect_args = Hash.new
+    to_redirect = false
+    
+    # sort by title
+    if (params["title"] or session["title"])
+      redirect_args["title"] = true
+      @movies = Movie.order(:title)
+      session["title"] = true
+      session["release_date"] = false
+      
+    # sort by release
+    elsif (params["release_date"] or session["release_date"])
+      redirect_args["release_date"] = true
+      @movies = Movie.order(:release_date)
+      session["title"] = false
+      session["release_date"] = true
+      
+    else
+      @movies = Movie.all
+      
+    end
     
     # which ones to pay attention to
     @param_ratings = @all_ratings.select do |rating|

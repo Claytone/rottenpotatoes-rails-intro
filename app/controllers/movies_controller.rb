@@ -10,8 +10,38 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
-  def index
+  def index #worry about this
     @movies = Movie.all
+    @all_ratings = Movie.get_ratings
+    redirect_args = Hash.new
+    
+    @param_ratings = @all_ratings.select do |rating|
+        params["rating_"+rating]
+      end
+    if not @param_ratings.empty?
+      @all_ratings.each do |rating|
+        session["rating_"+rating] = params["rating_"+rating]
+      end
+    else 
+      to_redirect = true
+    end
+    
+    @picked = @all_ratings.select do |rating|
+      session["rating_"+rating]
+    end
+    if(@picked.empty?)
+      to_redirect = true
+      @picked = @all_ratings
+    end
+    @picked.each do |rating|
+      redirect_args["rating_"+rating] = true
+    end
+    if to_redirect
+      redirect_to movies_path(redirect_args)
+    else
+      @movies = @movies.where("rating IN (?)", @picked)
+    end
+    
   end
 
   def new

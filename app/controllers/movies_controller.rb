@@ -37,6 +37,7 @@ class MoviesController < ApplicationController
       
     end
     
+    #session stuff goes here
     # which ones to pay attention to
     @param_ratings = @all_ratings.select do |rating|
         params["rating_"+rating]

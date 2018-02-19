@@ -11,10 +11,13 @@ class MoviesController < ApplicationController
   end
 
   def index #worry about this
+  
+    # declarations
     @movies = Movie.all
     @all_ratings = Movie.get_ratings
     redirect_args = Hash.new
     
+    # which ones to pay attention to
     @param_ratings = @all_ratings.select do |rating|
         params["rating_"+rating]
       end
@@ -26,16 +29,22 @@ class MoviesController < ApplicationController
       to_redirect = true
     end
     
+    # checkbox stuff
     @picked = @all_ratings.select do |rating|
       session["rating_"+rating]
     end
+    
+    # use redirect var to keep track of ratings when we hit the back button
     if(@picked.empty?)
       to_redirect = true
       @picked = @all_ratings
     end
+    
     @picked.each do |rating|
       redirect_args["rating_"+rating] = true
     end
+    
+    # append the redirection to the uri
     if to_redirect
       redirect_to movies_path(redirect_args)
     else
